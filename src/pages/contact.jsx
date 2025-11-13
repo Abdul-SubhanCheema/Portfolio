@@ -1,49 +1,21 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import emailjs from "@emailjs/browser";
 import Navbar from "../components/navbar";
-import { FaFacebook, FaInstagram, FaWhatsapp } from "react-icons/fa";
-
-const Particle = ({ id }) => (
-  <div
-    key={id}
-    className="absolute rounded-full bg-blue-300 opacity-30"
-    style={{
-      top: `${Math.random() * 100}%`,
-      left: `${Math.random() * 100}%`,
-      width: `${Math.random() * 8 + 2}px`,
-      height: `${Math.random() * 8 + 2}px`,
-      animation: `float ${Math.random() * 10 + 10}s linear infinite`,
-    }}
-  />
-);
+import NeuralNetwork from '../components/NeuralNetwork';
+import CustomCursor from '../components/CustomCursor';
+import { useTheme } from '../context/ThemeContext';
+import { FaFacebook, FaInstagram, FaWhatsapp, FaEnvelope, FaPhone, FaMapMarkerAlt } from "react-icons/fa";
 
 export default function Contact() {
-  const [particles, setParticles] = useState([]);
+  const { colors } = useTheme();
   const [success, setSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const formRef = useRef();
-
-  useEffect(() => {
-    const particleCount = Math.min(50, Math.floor(window.innerWidth / 20));
-    setParticles(Array.from({ length: particleCount }, (_, i) => i));
-
-    const style = document.createElement("style");
-    style.innerHTML = `
-      @keyframes float {
-        0% { transform: translate(0, 0) rotate(0deg); }
-        25% { transform: translate(10px, 10px) rotate(5deg); }
-        50% { transform: translate(0, 20px) rotate(0deg); }
-        75% { transform: translate(-10px, 10px) rotate(-5deg); }
-        100% { transform: translate(0, 0) rotate(0deg); }
-      }
-    `;
-    document.head.appendChild(style);
-
-    return () => document.head.removeChild(style);
-  }, []);
 
   const sendEmail = (e) => {
     e.preventDefault();
+    setIsLoading(true);
 
     emailjs
       .sendForm(
@@ -55,69 +27,181 @@ export default function Contact() {
       .then(
         () => {
           setSuccess(true);
+          setIsLoading(false);
           formRef.current.reset();
 
-          // Hide alert after 3 seconds
-          setTimeout(() => setSuccess(false), 3000);
+          // Hide alert after 5 seconds
+          setTimeout(() => setSuccess(false), 5000);
         },
         (error) => {
           console.error("EmailJS Error:", error.text);
+          setIsLoading(false);
         }
       );
   };
 
   return (
-    <div className="h-screen w-screen bg-gradient-to-br from-gray-900 to-blue-900 text-white relative overflow-hidden flex flex-col">
-      <div className="absolute inset-0 overflow-hidden z-0">
-        {particles.map((id) => (
-          <Particle key={id} id={id} />
-        ))}
+    <div className={`min-h-screen w-screen ${colors.primary} ${colors.text.primary} relative overflow-x-hidden flex flex-col`}>
+      {/* Custom Cursor - Hidden on touch devices */}
+      <div className="hidden md:block">
+        <CustomCursor />
       </div>
 
-      <div className="relative z-10">
-        <Navbar />
+      {/* Animated Gradient Background */}
+      <motion.div
+        className="absolute inset-0 opacity-30"
+        animate={{
+          background: [
+            'radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.3) 0%, transparent 50%)',
+            'radial-gradient(circle at 80% 50%, rgba(139, 92, 246, 0.3) 0%, transparent 50%)',
+            'radial-gradient(circle at 50% 80%, rgba(59, 130, 246, 0.3) 0%, transparent 50%)',
+            'radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.3) 0%, transparent 50%)',
+          ],
+        }}
+        transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+      />
+
+      {/* Neural Network Background */}
+      <NeuralNetwork />
+
+      <Navbar />
+      
+      {/* Main content */}
+      <main className="flex-grow container mx-auto px-4 md:px-6 py-12 relative z-10">
 
         <motion.div
-          className="max-w-2xl mx-auto mt-12 bg-white bg-opacity-10 backdrop-blur-md p-8 rounded-lg shadow-lg"
-          initial={{ opacity: 0, y: 60 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
+          transition={{ duration: 0.6 }}
+          className="max-w-6xl mx-auto"
         >
-          <h2 className="text-3xl font-bold text-center mb-6">Contact Me</h2>
-
-          <form ref={formRef} onSubmit={sendEmail} className="space-y-4">
-            <motion.input
-              type="text"
-              name="user_name"
-              placeholder="Your Name"
-              required
-              className="w-full px-4 py-2 rounded bg-white bg-opacity-20 backdrop-blur-md text-white placeholder-gray-300 focus:outline-none"
-              whileFocus={{ scale: 1.02 }}
-            />
-            <motion.input
-              type="email"
-              name="user_email"
-              placeholder="Your Email"
-              required
-              className="w-full px-4 py-2 rounded bg-white bg-opacity-20 backdrop-blur-md text-white placeholder-gray-300 focus:outline-none"
-              whileFocus={{ scale: 1.02 }}
-            />
-            <motion.textarea
-              name="message"
-              placeholder="Your Message"
-              required
-              rows="5"
-              className="w-full px-4 py-2 rounded bg-white bg-opacity-20 backdrop-blur-md text-white placeholder-gray-300 focus:outline-none"
-              whileFocus={{ scale: 1.02 }}
-            />
-            <motion.button
-              type="submit"
-              className="w-full bg-blue-500 hover:bg-blue-600 transition duration-300 py-2 rounded text-white font-semibold"
-              whileTap={{ scale: 0.95 }}
+          <motion.h1 
+            className="text-4xl md:text-6xl font-bold mb-12 text-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            Get In <span className="bg-gradient-to-r from-blue-400 via-blue-300 to-cyan-300 text-transparent bg-clip-text">Touch</span>
+          </motion.h1>
+          
+          <div className="grid lg:grid-cols-2 gap-12">
+            {/* Contact Form */}
+            <motion.div
+              className="backdrop-blur-xl bg-gradient-to-br from-slate-700/50 to-slate-800/30 rounded-xl p-8 border border-white/20"
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
             >
-              Send Message
-            </motion.button>
-          </form>
+              <h2 className="text-2xl font-bold mb-6 text-white">Send a Message</h2>
+
+              <form ref={formRef} onSubmit={sendEmail} className="space-y-6">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                >
+                  <input
+                    type="text"
+                    name="user_name"
+                    placeholder="Your Name"
+                    required
+                    className="w-full px-4 py-3 rounded-lg bg-slate-800/50 backdrop-blur-sm text-white placeholder-slate-400 border border-slate-600 focus:border-blue-400 focus:outline-none transition-colors duration-200"
+                  />
+                </motion.div>
+                
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <input
+                    type="email"
+                    name="user_email"
+                    placeholder="Your Email"
+                    required
+                    className="w-full px-4 py-3 rounded-lg bg-slate-800/50 backdrop-blur-sm text-white placeholder-slate-400 border border-slate-600 focus:border-blue-400 focus:outline-none transition-colors duration-200"
+                  />
+                </motion.div>
+                
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 }}
+                >
+                  <textarea
+                    name="message"
+                    placeholder="Your Message"
+                    required
+                    rows="6"
+                    className="w-full px-4 py-3 rounded-lg bg-slate-800/50 backdrop-blur-sm text-white placeholder-slate-400 border border-slate-600 focus:border-blue-400 focus:outline-none transition-colors duration-200 resize-none"
+                  />
+                </motion.div>
+                
+                <motion.button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-slate-500 disabled:to-slate-600 transition-all duration-300 py-3 rounded-lg text-white font-semibold flex items-center justify-center gap-2"
+                  whileTap={{ scale: 0.98 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.7 }}
+                >
+                  {isLoading ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <FaEnvelope className="w-4 h-4" />
+                      Send Message
+                    </>
+                  )}
+                </motion.button>
+              </form>
+            </motion.div>
+            
+            {/* Contact Information */}
+            <motion.div
+              className="space-y-8"
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <div className="backdrop-blur-xl bg-gradient-to-br from-slate-700/50 to-slate-800/30 rounded-xl p-6 border border-white/20">
+                <h3 className="text-xl font-bold mb-4 text-white">Contact Information</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                      <FaEnvelope className="text-blue-300" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-slate-400">Email</p>
+                      <p className="text-white">abdulsubhancheema97@gmail.com</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+                      <FaPhone className="text-green-300" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-slate-400">Phone</p>
+                      <p className="text-white">+92 343 8903037</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                      <FaMapMarkerAlt className="text-purple-300" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-slate-400">Location</p>
+                      <p className="text-white">Islamabad, Pakistan</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
           {/* Animated Alert */}
           <AnimatePresence>
@@ -133,39 +217,47 @@ export default function Contact() {
             )}
           </AnimatePresence>
 
-          <motion.div
-            className="mt-6 text-center space-x-4 text-xl"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-          >
-            <a
-              href="https://wa.me/your_number"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block hover:text-green-400"
-            >
-              <FaWhatsapp />
-            </a>
-            <a
-              href="https://facebook.com/your_page"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block hover:text-blue-400"
-            >
-              <FaFacebook />
-            </a>
-            <a
-              href="https://instagram.com/your_profile"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block hover:text-pink-400"
-            >
-              <FaInstagram />
-            </a>
-          </motion.div>
+              <div className="backdrop-blur-xl bg-gradient-to-br from-slate-700/50 to-slate-800/30 rounded-xl p-6 border border-white/20">
+                <h3 className="text-xl font-bold mb-4 text-white">Connect With Me</h3>
+                <div className="flex gap-4">
+                  <motion.a
+                    href="https://wa.me/your_number"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center w-12 h-12 bg-green-500/20 rounded-lg text-green-300 hover:bg-green-500/30 transition-colors duration-200"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <FaWhatsapp className="text-xl" />
+                  </motion.a>
+                  
+                  <motion.a
+                    href="https://facebook.com/your_page"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center w-12 h-12 bg-blue-500/20 rounded-lg text-blue-300 hover:bg-blue-500/30 transition-colors duration-200"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <FaFacebook className="text-xl" />
+                  </motion.a>
+                  
+                  <motion.a
+                    href="https://instagram.com/your_profile"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center w-12 h-12 bg-pink-500/20 rounded-lg text-pink-300 hover:bg-pink-500/30 transition-colors duration-200"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <FaInstagram className="text-xl" />
+                  </motion.a>
+                </div>
+              </div>
+            </motion.div>
+          </div>
         </motion.div>
-      </div>
+      </main>
     </div>
   );
 }

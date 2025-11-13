@@ -1,50 +1,265 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
-import {   IoLogoJavascript  } from 'react-icons/io';
-import { FaDocker, FaGithub,FaJenkins, FaReact, FaFigma, FaCode, FaJava ,FaDatabase,FaCheckCircle} from 'react-icons/fa';
+import { IoLogoJavascript } from 'react-icons/io';
+import { FaDocker, FaGithub, FaJenkins, FaReact, FaFigma, FaCode, FaJava, FaDatabase, FaCheckCircle, FaNodeJs } from 'react-icons/fa';
 import { AiOutlineKubernetes } from "react-icons/ai";
-import { SiMongodb ,SiFlutter} from "react-icons/si";
-
-import ProfileImg from '../assets/profile.jpg'
+import { SiMongodb, SiFlutter, SiAngular, SiDotnet } from "react-icons/si";
 
 import Navbar from '../components/navbar';
+import NeuralNetwork from '../components/NeuralNetwork';
+import CustomCursor from '../components/CustomCursor';
+import ModernAvatar from '../components/ModernAvatar';
+import { useTheme } from '../context/ThemeContext';
 
-// Particle component
-const Particle = ({ id }) => {
+
+
+// Expandable Skills Grid Component
+const SkillsGrid = ({ skills, title, skillInfo, colors }) => {
+  const [expandedCard, setExpandedCard] = useState(null);
+  const [hoveredCard, setHoveredCard] = useState(null);
+
   return (
-    <div 
-      key={id}
-      className="absolute rounded-full bg-blue-300 opacity-30"
-      style={{
-        top: `${Math.random() * 100}%`,
-        left: `${Math.random() * 100}%`,
-        width: `${Math.random() * 8 + 2}px`,
-        height: `${Math.random() * 8 + 2}px`,
-        animation: `float ${Math.random() * 10 + 10}s linear infinite`,
-      }}
-    />
+    <div className="mb-20">
+      {/* Category Title */}
+      <motion.h3 
+        className={`text-3xl font-bold mb-12 text-center ${colors.gradient.text}`}
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        {title}
+      </motion.h3>
+
+      {/* Skills Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+        {skills.map((skill, index) => (
+          <motion.div
+            key={skill.name}
+            layout
+            className={`relative cursor-pointer ${
+              expandedCard === index ? 'col-span-2 row-span-2' : ''
+            }`}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ 
+              duration: 0.5, 
+              delay: index * 0.1,
+              layout: { type: "spring", stiffness: 300, damping: 30 }
+            }}
+            onHoverStart={() => setHoveredCard(index)}
+            onHoverEnd={() => setHoveredCard(null)}
+            onClick={() => setExpandedCard(expandedCard === index ? null : index)}
+          >
+            <ExpandableSkillCard 
+              icon={skill.icon} 
+              name={skill.name} 
+              isExpanded={expandedCard === index}
+              isHovered={hoveredCard === index}
+              index={index}
+              skillInfo={skillInfo}
+              colors={colors}
+            />
+          </motion.div>
+        ))}
+      </div>
+    </div>
   );
 };
 
-// Skill Component
-const Skill = ({ icon, name, level }) => {
+// Modern Electric Border Component - Clean & Aesthetic
+const ElectricBorder = ({ isActive }) => {
+  return (
+    <>
+      {/* Subtle animated border */}
+      <motion.div
+        className="absolute inset-0 rounded-2xl pointer-events-none"
+        style={{
+          background: `linear-gradient(90deg, 
+            transparent 0%, 
+            rgba(34, 211, 238, 0.4) 25%, 
+            rgba(59, 130, 246, 0.6) 50%, 
+            rgba(34, 211, 238, 0.4) 75%, 
+            transparent 100%
+          )`,
+          backgroundSize: '200% 100%',
+          mask: 'linear-gradient(white, white) content-box, linear-gradient(white, white)',
+          maskComposite: 'xor',
+          WebkitMask: 'linear-gradient(white, white) content-box, linear-gradient(white, white)',
+          WebkitMaskComposite: 'xor',
+          padding: '1px'
+        }}
+        animate={isActive ? {
+          backgroundPosition: ['0% 0%', '100% 0%'],
+          opacity: [0.3, 0.8, 0.3]
+        } : {
+          opacity: 0
+        }}
+        transition={{
+          backgroundPosition: {
+            duration: 2,
+            repeat: Infinity,
+            ease: "linear"
+          },
+          opacity: {
+            duration: 1.5,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }
+        }}
+      />
+      
+      {/* Subtle glow effect */}
+      <motion.div
+        className="absolute inset-0 rounded-2xl pointer-events-none"
+        animate={isActive ? {
+          boxShadow: [
+            '0 0 20px rgba(34, 211, 238, 0.2)',
+            '0 0 30px rgba(59, 130, 246, 0.3)',
+            '0 0 20px rgba(34, 211, 238, 0.2)'
+          ]
+        } : {
+          boxShadow: '0 0 0px rgba(34, 211, 238, 0)'
+        }}
+        transition={{
+          duration: 2,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      />
+    </>
+  );
+};
+
+// Clean Expandable Skill Card Component
+const ExpandableSkillCard = ({ icon, name, isExpanded, isHovered, skillInfo, colors }) => {
   const Icon = icon;
   
   return (
     <motion.div 
-      className="flex flex-col items-center p-4 bg-gray-800 bg-opacity-50 rounded-lg"
-      whileHover={{ y: -5, boxShadow: "0 10px 20px rgba(0,0,0,0.2)" }}
-      transition={{ duration: 0.3 }}
+      className={`relative group backdrop-blur-sm rounded-xl transition-all duration-300 overflow-hidden cursor-pointer ${
+        isExpanded 
+          ? 'h-80 bg-gradient-to-br from-slate-700/70 to-slate-800/50' 
+          : 'h-40 bg-gradient-to-br from-slate-700/50 to-slate-800/30'
+      }`}
+      style={{
+        border: isExpanded || isHovered 
+          ? '1px solid rgba(59, 130, 246, 0.6)'
+          : '1px solid rgba(255, 255, 255, 0.2)'
+      }}
+      whileHover={!isExpanded ? { 
+        scale: 1.02,
+        y: -4,
+        boxShadow: "0 8px 25px -5px rgba(0, 0, 0, 0.4)"
+      } : {}}
+      whileTap={{ scale: 0.98 }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
     >
-      <div className="mb-3 text-blue-300">
-        <Icon size={36} />
-      </div>
-      <h3 className="text-lg font-medium mb-1">{name}</h3>
-      <div className="w-full bg-gray-700 rounded-full h-2 mt-2">
-        <div 
-          className="bg-blue-500 h-2 rounded-full" 
-          style={{ width: `${level}%` }}
+      {/* Modern Electric Border */}
+      <ElectricBorder isActive={isHovered || isExpanded} />
+      {/* Subtle accent overlay */}
+      <motion.div
+        className="absolute inset-0 rounded-xl"
+        animate={{
+          opacity: isExpanded || isHovered ? 0.15 : 0
+        }}
+        style={{
+          background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15), transparent 50%, rgba(34, 211, 238, 0.12))'
+        }}
+        transition={{ duration: 0.3 }}
+      />
+      
+      {/* Clean expansion indicator */}
+      {isExpanded && (
+        <motion.div
+          className="absolute top-4 right-4 w-2 h-2 bg-blue-300 rounded-full"
+          animate={{ opacity: [0.6, 1, 0.6] }}
+          transition={{ duration: 2, repeat: Infinity }}
         />
+      )}
+      
+      {/* Content container */}
+      <div className={`relative z-10 h-full flex flex-col items-center p-6 ${
+        isExpanded ? 'justify-start pt-8' : 'justify-center'
+      }`}>
+        
+        {/* Clean icon container */}
+        <motion.div 
+          className={`relative mb-4 p-3 rounded-lg z-10 ${
+            isExpanded 
+              ? 'bg-gradient-to-br from-blue-500/25 to-blue-600/20'
+              : 'bg-gradient-to-br from-slate-600/60 to-slate-700/40'
+          }`}
+          animate={{
+            scale: isExpanded ? 1.2 : isHovered ? 1.05 : 1
+          }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+        >
+          <motion.div
+            className={`${
+              isExpanded || isHovered ? 'text-blue-300' : 'text-slate-200'
+            } transition-colors duration-200`}
+            animate={{ 
+              rotate: isHovered ? [0, -5, 5, 0] : 0
+            }}
+            transition={{ duration: 0.4 }}
+          >
+            <Icon size={isExpanded ? 48 : 32} />
+          </motion.div>
+        </motion.div>
+        
+        {/* Clean skill name */}
+        <motion.h3 
+          className={`text-center font-semibold text-white ${
+            isExpanded ? 'text-xl mb-4' : 'text-base'
+          }`}
+          animate={{ 
+            scale: isExpanded ? 1.05 : 1,
+            color: isExpanded || isHovered ? '#93c5fd' : '#ffffff'
+          }}
+          transition={{ duration: 0.3 }}
+        >
+          {name}
+        </motion.h3>
+        
+        {/* Expanded content with unique information */}
+        <motion.div
+          className="text-center px-2"
+          animate={{ 
+            opacity: isExpanded ? 1 : 0,
+            y: isExpanded ? 0 : 20
+          }}
+          transition={{ duration: 0.4, delay: isExpanded ? 0.2 : 0 }}
+        >
+          {isExpanded && skillInfo[name] && (
+            <div className={`${colors.text.secondary} text-sm leading-relaxed`}>
+              {skillInfo[name].description}
+            </div>
+          )}
+        </motion.div>
+        
+        {/* Simple accent line */}
+        {isExpanded && (
+          <motion.div
+            className="absolute bottom-6 left-6 right-6 h-px bg-gradient-to-r from-transparent via-blue-300/70 to-transparent"
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          />
+        )}
+        
+        {/* Simple click indicator */}
+        {!isExpanded && (
+          <motion.div
+            className="absolute bottom-3 right-3 text-xs text-slate-300"
+            animate={{ 
+              opacity: isHovered ? 0.9 : 0
+            }}
+            transition={{ duration: 0.2 }}
+          >
+            Click to expand
+          </motion.div>
+        )}
       </div>
     </motion.div>
   );
@@ -61,130 +276,171 @@ const CIcon = () => (
 
 // About Page Component
 export default function About() {
-  
-  const [particles, setParticles] = useState([]);
+  const { colors } = useTheme();
 
-  useEffect(() => {
-    // Generate particles based on screen size
-    const particleCount = Math.min(50, Math.floor(window.innerWidth / 20));
-    setParticles(Array.from({ length: particleCount }, (_, i) => i));
-
-    // Add keyframes for floating animation
-    const style = document.createElement('style');
-    style.innerHTML = `
-      @keyframes float {
-        0% { transform: translate(0, 0) rotate(0deg); }
-        25% { transform: translate(10px, 10px) rotate(5deg); }
-        50% { transform: translate(0, 20px) rotate(0deg); }
-        75% { transform: translate(-10px, 10px) rotate(-5deg); }
-        100% { transform: translate(0, 0) rotate(0deg); }
-      }
-      html, body, #root {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        overflow-x: hidden;
-      }
-    `;
-    document.head.appendChild(style);
-    
-    return () => {
-      document.head.removeChild(style);
-    };
-  }, []);
+  // Detailed skill information with unique descriptions
+  const skillInfo = {
+    "Docker": {
+      description: "Containerization expert with experience in multi-stage builds, orchestration, and deployment strategies."
+    },
+    "Git": {
+      description: "Version control mastery including branching strategies, merge conflict resolution, and collaborative workflows."
+    },
+    "Jenkins": {
+      description: "CI/CD pipeline automation, build optimization, and deployment orchestration across multiple environments."
+    },
+    "Kubernetes": {
+      description: "Container orchestration, service mesh implementation, and cloud-native application deployment."
+    },
+    "React": {
+      description: "Modern React development with hooks, context API, state management, and performance optimization."
+    },
+    "Angular": {
+      description: "Enterprise-scale applications using Angular framework, TypeScript, and reactive programming patterns."
+    },
+    "Node.js": {
+      description: "Server-side JavaScript development, API design, microservices architecture, and real-time applications."
+    },
+    "JavaScript": {
+      description: "Modern ES6+ JavaScript, async programming, functional programming, and browser API integration."
+    },
+    "HTML/CSS": {
+      description: "Semantic HTML5, advanced CSS3, responsive design, animations, and modern layout techniques."
+    },
+    "C/C++/C#": {
+      description: "System programming, memory management, object-oriented design, and performance-critical applications."
+    },
+    ".NET": {
+      description: "Full-stack .NET development, Web API creation, Entity Framework, and cloud integration."
+    },
+    "Java": {
+      description: "Object-oriented programming, Spring framework, enterprise applications, and design patterns."
+    },
+    "SQL": {
+      description: "Database design, complex queries, performance optimization, and data modeling across multiple platforms."
+    },
+    "MongoDB": {
+      description: "NoSQL database design, aggregation pipelines, indexing strategies, and document-based data modeling."
+    },
+    "Figma": {
+      description: "UI/UX design, prototyping, component systems, design tokens, and collaborative design workflows."
+    },
+    "Quality Assurance": {
+      description: "Test automation, manual testing strategies, bug tracking, and quality process implementation."
+    },
+    "React Native": {
+      description: "Cross-platform mobile development, native module integration, and performance optimization."
+    },
+    "Flutter": {
+      description: "Dart-based mobile development, widget composition, state management, and native performance."
+    }
+  };
 
   // Skill categories with their respective skills
   const skillCategories = [
     {
       title: "DevOps",
       skills: [
-        { name: "Docker", icon: FaDocker, level: 85 },
-        { name: "Git", icon: FaGithub, level: 90 },
-        { name: "Jenkins", icon: FaJenkins, level: 75 },
-        { name: "Kubernetes", icon: AiOutlineKubernetes, level: 85 }
+        { name: "Docker", icon: FaDocker },
+        { name: "Git", icon: FaGithub },
+        { name: "Jenkins", icon: FaJenkins },
+        { name: "Kubernetes", icon: AiOutlineKubernetes }
       ]
     },
     {
       title: "Web Development",
       skills: [
-        { name: "React", icon: FaReact, level: 90 },
-        { name: "JavaScript", icon: IoLogoJavascript, level: 85 },
-        { name: "HTML/CSS", icon: FaCode, level: 95 }
+        { name: "React", icon: FaReact },
+        { name: "Angular", icon: SiAngular },
+        { name: "Node.js", icon: FaNodeJs },
+        { name: "JavaScript", icon: IoLogoJavascript },
+        { name: "HTML/CSS", icon: FaCode }
       ]
     },
     {
       title: "Programming Languages",
       skills: [
-        { name: "C/C++/C#", icon: CIcon, level: 80 },
-        { name: "Java", icon: FaJava, level: 75 }
+        { name: "C/C++/C#", icon: CIcon },
+        { name: ".NET", icon: SiDotnet },
+        { name: "Java", icon: FaJava }
       ]
     },
     {
       title: "Database & Design",
       skills: [
-        { name: "SQL", icon: FaDatabase, level: 85 },
-        { name: "MongoDB", icon: SiMongodb, level: 85 },
-        { name: "Figma", icon: FaFigma, level: 70 }
+        { name: "SQL", icon: FaDatabase },
+        { name: "MongoDB", icon: SiMongodb },
+        { name: "Figma", icon: FaFigma }
       ]
     },
     {
-        title: "Testing ",
+        title: "Testing",
         skills: [
-          { name: "Quality Assurance", icon: FaCheckCircle, level: 85 },
-          
+          { name: "Quality Assurance", icon: FaCheckCircle }
         ]
       },
       {
         title: "Mobile Development",
         skills: [
-          { name: "React Native", icon: FaReact, level: 85 },
-          { name: "Flutter", icon: SiFlutter, level: 85 },
-          
+          { name: "React Native", icon: FaReact },
+          { name: "Flutter", icon: SiFlutter }
         ]
       },
   ];
 
   return (
-    <div className="h-screen w-screen bg-gradient-to-br from-gray-900 to-blue-900 text-white relative overflow-x-hidden">
-      
-      <div className="absolute inset-0 overflow-hidden">
-        {particles.map(id => (
-          <Particle key={id} id={id} />
-        ))}
+    <div className={`min-h-screen w-screen ${colors.primary} ${colors.text.primary} relative overflow-x-hidden flex flex-col`}>
+      {/* Custom Cursor - Hidden on touch devices */}
+      <div className="hidden md:block">
+        <CustomCursor />
       </div>
-      
-    
+
+      {/* Animated Gradient Background */}
+      <motion.div
+        className="absolute inset-0 opacity-30"
+        animate={{
+          background: [
+            'radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.3) 0%, transparent 50%)',
+            'radial-gradient(circle at 80% 50%, rgba(139, 92, 246, 0.3) 0%, transparent 50%)',
+            'radial-gradient(circle at 50% 80%, rgba(59, 130, 246, 0.3) 0%, transparent 50%)',
+            'radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.3) 0%, transparent 50%)',
+          ],
+        }}
+        transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+      />
+
+      {/* Neural Network Background */}
+      <NeuralNetwork />
+
       <Navbar />
       
       {/* Main content */}
-      <main className="container mx-auto px-6 py-12 relative z-10">
+      <main className="flex-grow container mx-auto px-4 md:px-6 py-12 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="max-w-4xl mx-auto"
+          className="max-w-6xl mx-auto"
         >
-          <h1 className="text-4xl md:text-5xl font-bold mb-8 text-center">
-            About <span className="text-blue-300">Me</span>
-          </h1>
+          <motion.h1 
+            className="text-4xl md:text-6xl font-bold mb-12 text-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            About <span className="bg-gradient-to-r from-blue-400 via-blue-300 to-cyan-300 text-transparent bg-clip-text">Me</span>
+          </motion.h1>
           
-          {/* About section */}
-          <div className="bg-gray-800 bg-opacity-50 rounded-xl p-6 mb-12">
-            <div className="flex flex-col md:flex-row gap-8 items-center">
+          {/* About section
+          <div className={`${colors.glass.primary} rounded-2xl p-8 mb-16 shadow-2xl`}>
+            <div className="flex flex-col md:flex-row gap-12 items-center">
               <motion.div 
                 className="md:w-1/3 flex justify-center"
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5 }}
               >
-                <div className="relative">
-                  <div className="absolute inset-0 bg-blue-500 rounded-full blur-md opacity-30 scale-110" />
-                  <img 
-                    src={ProfileImg}
-                    alt="Profile" 
-                    className="rounded-full h-48 w-48 object-cover relative border-4 border-blue-500" 
-                  />
-                </div>
+                <ModernAvatar />
               </motion.div>
               
               <motion.div 
@@ -193,94 +449,101 @@ export default function About() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
               >
-                <h2 className="text-2xl font-bold mb-4">Who I Am</h2>
-                <p className="text-gray-300 mb-4">
-                  Hello! I'm <span className="text-blue-300 font-medium">Your Name</span>, a passionate 
-                  developer with expertise in web development and DevOps. With over 5 years of experience 
+                <h2 className="text-3xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-cyan-400 text-transparent bg-clip-text">Who I Am</h2>
+                <p className={`${colors.text.secondary} mb-6 text-lg leading-relaxed`}>
+                  Hello! I'm <span className={`${colors.text.accent} font-semibold`}>Abdul Subhan</span>, a passionate 
+                  software engineer with expertise in full-stack development and DevOps. With extensive experience 
                   in the technology field, I've worked on a variety of projects ranging from 
                   responsive web applications to scalable infrastructure solutions.
                 </p>
-                <p className="text-gray-300">
-                  My journey into technology began when I was studying computer science and 
-                  discovered my passion for creating practical solutions to real-world problems. 
-                  I'm constantly learning and exploring new technologies to stay at the forefront 
-                  of this ever-evolving industry.
+                <p className={`${colors.text.secondary} text-lg leading-relaxed`}>
+                  My journey into technology began with a fascination for problem-solving and creating 
+                  digital solutions that make a real impact. I'm constantly learning and exploring 
+                  cutting-edge technologies to deliver innovative, user-centric applications.
                 </p>
               </motion.div>
             </div>
-          </div>
+          </div> */}
           
-          {/* Skills section */}
+          {/* Education & Experience Section */}
           <motion.div
+            className={`mt-20 ${colors.glass.primary} rounded-2xl p-8 shadow-2xl`}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <h2 className="text-3xl font-bold mb-10 text-center">
-              My <span className="text-blue-300">Skills</span>
-            </h2>
-            
-            <div className="space-y-12">
-              {skillCategories.map((category, index) => (
-                <div key={index} className="mb-10">
-                  <motion.h3 
-                    className="text-2xl font-semibold mb-6 border-b border-blue-500 pb-2 inline-block"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: 0.1 * index }}
-                  >
-                    {category.title}
-                  </motion.h3>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {category.skills.map((skill, skillIndex) => (
-                      <motion.div
-                        key={skillIndex}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.1 * skillIndex + 0.2 * index }}
-                      >
-                        <Skill 
-                          icon={skill.icon} 
-                          name={skill.name} 
-                        />
-                      </motion.div>
-                    ))}
-                  </div>
-                </div>
-              ))}
+            <h2 className={`text-3xl font-bold mb-8 ${colors.gradient.text}`}>Education & Experience</h2>
+            <div className="space-y-8">
+              {/* Education Section */}
+              <motion.div 
+                className="border-l-4 border-blue-400 pl-6 backdrop-blur-sm bg-white/5 rounded-r-xl p-4"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+              >
+                <h3 className={`text-xl font-semibold ${colors.text.accent}`}>Bachelor of Software Engineering</h3>
+                <p className={`${colors.text.tertiary}`}>FAST National University of Computer and Emerging Sciences (NUCES), Islamabad</p>
+                <p className={`text-sm ${colors.text.muted} mt-1`}>Graduate in Software Engineering</p>
+              </motion.div>
+              
+              {/* Work Experience Section */}
+              <motion.div 
+                className="border-l-4 border-blue-400 pl-6 backdrop-blur-sm bg-white/5 rounded-r-xl p-4"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.5 }}
+              >
+                <h3 className={`text-xl font-semibold ${colors.text.accent}`}>Software Engineer</h3>
+                <p className={`${colors.text.tertiary}`}>CareCloud - Present</p>
+                <p className={`${colors.text.secondary} mt-3 leading-relaxed`}>
+                  Currently working as a Software Engineer, developing and maintaining healthcare technology solutions. 
+                  Focusing on scalable software architecture, system optimization, and delivering high-quality medical software products.
+                </p>
+              </motion.div>
+              <motion.div 
+                className="border-l-4 border-blue-400 pl-6 backdrop-blur-sm bg-white/5 rounded-r-xl p-4"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.6 }}
+              >
+                <h3 className={`text-xl font-semibold ${colors.text.accent}`}>Full Stack Developer</h3>
+                <p className={`${colors.text.tertiary}`}>CareCloud & CodexCue Solutions</p>
+                <p className={`${colors.text.secondary} mt-3 leading-relaxed`}>
+                  Worked as a Full Stack Developer across both companies, building end-to-end applications 
+                  using modern technologies including React, Node.js, and various databases. Contributed to 
+                  healthcare and business solutions with focus on user experience and system reliability.
+                </p>
+              </motion.div>
             </div>
           </motion.div>
-          
-          {/* Additional Info */}
+
+          {/* Skills section */}
           <motion.div
-            className="mt-16 bg-gray-800 bg-opacity-50 rounded-xl p-6"
+            className="mt-16"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
+            transition={{ duration: 0.6, delay: 0.7 }}
           >
-            <h2 className="text-2xl font-bold mb-4">Education & Experience</h2>
-            <div className="space-y-4">
-              <div className="border-l-4 border-blue-500 pl-4">
-                <h3 className="text-xl font-medium text-blue-300">Bachelor of Computer Science</h3>
-                <p className="text-gray-400">University Name, 2015-2019</p>
-              </div>
-              <div className="border-l-4 border-blue-500 pl-4">
-                <h3 className="text-xl font-medium text-blue-300">Senior Developer</h3>
-                <p className="text-gray-400">Company Name, 2019-Present</p>
-                <p className="text-gray-300 mt-2">
-                  Leading development of web applications and implementing DevOps practices to streamline 
-                  development and deployment processes.
-                </p>
-              </div>
-              <div className="border-l-4 border-blue-500 pl-4">
-                <h3 className="text-xl font-medium text-blue-300">Junior Developer</h3>
-                <p className="text-gray-400">Previous Company, 2017-2019</p>
-                <p className="text-gray-300 mt-2">
-                  Contributed to frontend and backend development for various client projects using 
-                  modern web technologies.
-                </p>
-              </div>
+            <h2 className={`text-4xl font-bold mb-12 text-center ${colors.text.primary}`}>
+              My <span className={colors.gradient.text}>Skills</span>
+            </h2>
+            
+            <div className="space-y-16">
+              {skillCategories.map((category, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.8 + (0.2 * index) }}
+                >
+                  <SkillsGrid 
+                    skills={category.skills}
+                    title={category.title}
+                    skillInfo={skillInfo}
+                    colors={colors}
+                  />
+                </motion.div>
+              ))}
             </div>
           </motion.div>
         </motion.div>

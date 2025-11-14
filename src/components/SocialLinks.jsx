@@ -4,9 +4,8 @@ import { Github, Linkedin, Twitter, Mail } from 'lucide-react';
 import { motion } from 'framer-motion';
 const socialLinks = [
   { icon: Github, href: 'https://github.com/Abdul-SubhanCheema', label: 'GitHub', color: 'hover:text-gray-300' },
-  { icon: Linkedin, href: '#', label: 'LinkedIn', color: 'hover:text-blue-400' },
-  { icon: Twitter, href: '#', label: 'Twitter', color: 'hover:text-sky-400' },
-  { icon: Mail, href: '#', label: 'Email', color: 'hover:text-red-400' },
+  { icon: Linkedin, href: 'https://www.linkedin.com/in/abdulsubhan303', label: 'LinkedIn', color: 'hover:text-blue-400' },
+  { icon: Mail, href: 'mailto:abdulsubhancheema97@gmail.com', label: 'Email', color: 'hover:text-red-400' },
 ];
 
 export default function SocialLinks() {

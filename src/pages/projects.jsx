@@ -6,49 +6,59 @@ import CustomCursor from '../components/CustomCursor';
 import { useTheme } from '../context/ThemeContext';
 import { FaGithub } from "react-icons/fa";
 
-const ProjectCard = ({ title, description, link, index }) => (
-  <motion.div
-    className="group relative backdrop-blur-xl bg-gradient-to-br from-slate-700/50 to-slate-800/30 rounded-xl p-6 border border-white/20 transition-all duration-300 hover:border-blue-400/40"
-    whileHover={{ 
-      scale: 1.02,
-      y: -4,
-      boxShadow: "0 10px 40px -10px rgba(59, 130, 246, 0.3)"
-    }}
-    initial={{ opacity: 0, y: 30 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ 
-      duration: 0.5,
-      delay: index * 0.1
-    }}
-  >
-    {/* Subtle accent overlay */}
+const ProjectCard = ({ title, description, link, index, theme }) => {
+  const { colors, isDarkMode } = theme || {};
+  
+  if (!colors) return null;
+  
+  return (
     <motion.div
-      className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-10"
+      className={`group relative ${colors.glass.primary} rounded-xl p-6 transition-all duration-300`}
       style={{
-        background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15), transparent 50%, rgba(34, 211, 238, 0.12))'
+        border: `1px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)'}`,
       }}
-      transition={{ duration: 0.3 }}
-    />
-    
-    <div className="relative z-10">
-      <h3 className="text-xl font-bold mb-3 text-white group-hover:text-blue-200 transition-colors duration-200">{title}</h3>
-      <p className="text-slate-300 mb-6 leading-relaxed">{description}</p>
-      <motion.a
-        href={link}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center px-4 py-2 rounded-lg bg-blue-500/20 text-blue-300 border border-blue-400/30 hover:bg-blue-500/30 hover:border-blue-400/50 transition-all duration-200"
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-      >
-        <FaGithub className="mr-2" /> View on GitHub
-      </motion.a>
-    </div>
-  </motion.div>
-);
+      whileHover={{ 
+        scale: 1.02,
+        y: -4,
+        boxShadow: isDarkMode ? "0 10px 40px -10px rgba(59, 130, 246, 0.3)" : "0 10px 40px -10px rgba(59, 130, 246, 0.15)"
+      }}
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ 
+        duration: 0.5,
+        delay: index * 0.1
+      }}
+    >
+      {/* Subtle accent overlay */}
+      <motion.div
+        className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-10"
+        style={{
+          background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15), transparent 50%, rgba(34, 211, 238, 0.12))'
+        }}
+        transition={{ duration: 0.3 }}
+      />
+      
+      <div className="relative z-10">
+        <h3 className={`text-xl font-bold mb-3 ${colors.text.primary} group-hover:${colors.text.accent} transition-colors duration-200`}>{title}</h3>
+        <p className={`${colors.text.secondary} mb-6 leading-relaxed`}>{description}</p>
+        <motion.a
+          href={link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`inline-flex items-center px-4 py-2 rounded-lg ${colors.glass.secondary} ${colors.text.accent} ${colors.border.primary} hover:${colors.glass.hover} transition-all duration-200`}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <FaGithub className="mr-2" /> View on GitHub
+        </motion.a>
+      </div>
+    </motion.div>
+  );
+};
 
 export default function Projects() {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
 
   const projects = [
     {
@@ -167,12 +177,12 @@ export default function Projects() {
           className="max-w-7xl mx-auto"
         >
           <motion.h1 
-            className="text-4xl md:text-6xl font-bold mb-12 text-center"
+            className={`text-4xl md:text-6xl font-bold mb-12 text-center ${colors.text.primary}`}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            My <span className="bg-gradient-to-r from-blue-400 via-blue-300 to-cyan-300 text-transparent bg-clip-text">Projects</span>
+            My <span className={colors.gradient.text}>Projects</span>
           </motion.h1>
           <motion.div
             className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8"
@@ -194,6 +204,7 @@ export default function Projects() {
                 description={project.description}
                 link={project.link}
                 index={index}
+                theme={theme}
               />
             ))}
           </motion.div>

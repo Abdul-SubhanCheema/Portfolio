@@ -65,12 +65,35 @@ const Navbar = () => {
           }}
         />
         <div className="relative flex justify-between items-center">
-          {/* Enhanced Logo */}
+          {/* Mobile Menu Button - Left Side (Mobile Only) */}
+          <div className="md:hidden relative z-10">
+            <motion.button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className={`relative p-3 rounded-xl ${colors.glass.secondary} ${colors.text.accent} hover:${colors.text.accent.replace('text-', 'text-blue-')}200 transition-all duration-300 hover:${colors.glass.hover} focus:outline-none`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <motion.div
+                animate={{ rotate: menuOpen ? 180 : 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                {menuOpen ? <X size={24} /> : <Menu size={24} />}
+              </motion.div>
+              
+              {/* Button glow effect */}
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-xl blur opacity-0 hover:opacity-100"
+                transition={{ duration: 0.3 }}
+              />
+            </motion.button>
+          </div>
+
+          {/* Enhanced Logo - Left on Desktop, Center on Mobile */}
           <motion.div 
             initial={{ opacity: 0, x: -20 }} 
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="relative group cursor-pointer"
+            className="relative group cursor-pointer md:flex-none flex-1 md:text-left text-center"
           >
             <motion.div
               className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-500 text-transparent bg-clip-text relative z-10"
@@ -106,8 +129,8 @@ const Navbar = () => {
                     to={link.to}
                     className={`relative px-4 py-2 rounded-lg font-medium transition-all duration-300 group ${
                       isActive 
-                        ? 'text-blue-300 bg-blue-500/20 border border-blue-400/30' 
-                        : 'text-white hover:text-blue-300 hover:bg-white/10'
+                        ? `${colors.text.accent} bg-blue-500/20 border border-blue-400/30` 
+                        : `${colors.text.primary} hover:${colors.text.accent} hover:bg-white/10`
                     }`}
                   >
                     <span className="relative z-10">{link.name}</span>
@@ -138,7 +161,7 @@ const Navbar = () => {
           {/* Theme Toggle Button */}
           <motion.button
             onClick={toggleTheme}
-            className="relative p-3 rounded-xl bg-slate-800/50 border border-white/20 text-blue-300 hover:text-blue-200 transition-all duration-300 hover:bg-slate-700/50 focus:outline-none group"
+            className={`relative p-3 rounded-xl ${colors.glass.secondary} ${colors.text.accent} hover:${colors.text.accent.replace('text-', 'text-blue-')}200 transition-all duration-300 hover:${colors.glass.hover} focus:outline-none group`}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             initial={{ opacity: 0 }}
@@ -158,29 +181,6 @@ const Navbar = () => {
               transition={{ duration: 0.3 }}
             />
           </motion.button>
-
-          {/* Enhanced Mobile Menu Button */}
-          <div className="md:hidden relative z-10">
-            <motion.button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="relative p-3 rounded-xl bg-slate-800/50 border border-white/20 text-blue-300 hover:text-blue-200 transition-all duration-300 hover:bg-slate-700/50 focus:outline-none"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <motion.div
-                animate={{ rotate: menuOpen ? 180 : 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                {menuOpen ? <X size={24} /> : <Menu size={24} />}
-              </motion.div>
-              
-              {/* Button glow effect */}
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-xl blur opacity-0 hover:opacity-100"
-                transition={{ duration: 0.3 }}
-              />
-            </motion.button>
-          </div>
         </div>
       </motion.div>
 
@@ -192,11 +192,11 @@ const Navbar = () => {
             animate={{ height: "auto", opacity: 1, scale: 1 }}
             exit={{ height: 0, opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
-            className="md:hidden mt-4 backdrop-blur-xl bg-gradient-to-br from-slate-800/60 to-slate-900/40 rounded-xl border border-white/20 shadow-2xl p-4 space-y-1 relative overflow-hidden"
+            className={`md:hidden mt-4 ${colors.glass.primary} rounded-xl shadow-2xl p-4 space-y-1 relative overflow-hidden`}
           >
             {/* Mobile menu background effect */}
             <motion.div
-              className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-cyan-500/5"
+              className={`absolute inset-0 ${colors.glass.secondary} rounded-xl`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
@@ -216,8 +216,8 @@ const Navbar = () => {
                     onClick={() => setMenuOpen(false)}
                     className={`relative block px-4 py-3 rounded-lg font-medium transition-all duration-300 ${
                       isActive 
-                        ? 'text-blue-300 bg-blue-500/20 border border-blue-400/30' 
-                        : 'text-white hover:bg-white/10 hover:text-blue-300'
+                        ? `${colors.text.accent} bg-blue-500/20 border border-blue-400/30` 
+                        : `${colors.text.primary} hover:bg-white/10 hover:${colors.text.accent}`
                     }`}
                   >
                     <span className="relative z-10">{link.name}</span>

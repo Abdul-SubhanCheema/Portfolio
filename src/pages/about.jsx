@@ -15,9 +15,15 @@ import { useTheme } from '../context/ThemeContext';
 
 
 // Expandable Skills Grid Component
-const SkillsGrid = ({ skills, title, skillInfo, colors }) => {
+const SkillsGrid = ({ skills, title, skillInfo, theme }) => {
   const [expandedCard, setExpandedCard] = useState(null);
   const [hoveredCard, setHoveredCard] = useState(null);
+  const { colors } = theme || {};
+
+  if (!colors) {
+    console.error('Theme colors not available in SkillsGrid');
+    return null;
+  }
 
   return (
     <div className="mb-20">
@@ -58,7 +64,7 @@ const SkillsGrid = ({ skills, title, skillInfo, colors }) => {
               isHovered={hoveredCard === index}
               index={index}
               skillInfo={skillInfo}
-              colors={colors}
+              theme={theme}
             />
           </motion.div>
         ))}
@@ -132,25 +138,31 @@ const ElectricBorder = ({ isActive }) => {
 };
 
 // Clean Expandable Skill Card Component
-const ExpandableSkillCard = ({ icon, name, isExpanded, isHovered, skillInfo, colors }) => {
+const ExpandableSkillCard = ({ icon, name, isExpanded, isHovered, skillInfo, theme }) => {
   const Icon = icon;
+  const { colors, isDarkMode } = theme || {};
+
+  if (!colors) {
+    console.error('Theme colors not available in ExpandableSkillCard');
+    return null;
+  }
   
   return (
     <motion.div 
       className={`relative group backdrop-blur-sm rounded-xl transition-all duration-300 overflow-hidden cursor-pointer ${
         isExpanded 
-          ? 'h-80 bg-gradient-to-br from-slate-700/70 to-slate-800/50' 
-          : 'h-40 bg-gradient-to-br from-slate-700/50 to-slate-800/30'
+          ? `h-80 ${colors.glass.primary}`
+          : `h-40 ${colors.glass.secondary}`
       }`}
       style={{
         border: isExpanded || isHovered 
-          ? '1px solid rgba(59, 130, 246, 0.6)'
-          : '1px solid rgba(255, 255, 255, 0.2)'
+          ? `1px solid ${isDarkMode ? 'rgba(59, 130, 246, 0.6)' : 'rgba(59, 130, 246, 0.8)'}`
+          : `1px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)'}`
       }}
       whileHover={!isExpanded ? { 
         scale: 1.02,
         y: -4,
-        boxShadow: "0 8px 25px -5px rgba(0, 0, 0, 0.4)"
+        boxShadow: isDarkMode ? "0 8px 25px -5px rgba(0, 0, 0, 0.4)" : "0 8px 25px -5px rgba(0, 0, 0, 0.15)"
       } : {}}
       whileTap={{ scale: 0.98 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
@@ -172,7 +184,7 @@ const ExpandableSkillCard = ({ icon, name, isExpanded, isHovered, skillInfo, col
       {/* Clean expansion indicator */}
       {isExpanded && (
         <motion.div
-          className="absolute top-4 right-4 w-2 h-2 bg-blue-300 rounded-full"
+          className={`absolute top-4 right-4 w-2 h-2 ${colors.text.accent.replace('text-', 'bg-')} rounded-full`}
           animate={{ opacity: [0.6, 1, 0.6] }}
           transition={{ duration: 2, repeat: Infinity }}
         />
@@ -187,8 +199,8 @@ const ExpandableSkillCard = ({ icon, name, isExpanded, isHovered, skillInfo, col
         <motion.div 
           className={`relative mb-4 p-3 rounded-lg z-10 ${
             isExpanded 
-              ? 'bg-gradient-to-br from-blue-500/25 to-blue-600/20'
-              : 'bg-gradient-to-br from-slate-600/60 to-slate-700/40'
+              ? `${colors.glass.hover} shadow-lg`
+              : `${colors.glass.secondary} shadow-md`
           }`}
           animate={{
             scale: isExpanded ? 1.2 : isHovered ? 1.05 : 1
@@ -197,7 +209,7 @@ const ExpandableSkillCard = ({ icon, name, isExpanded, isHovered, skillInfo, col
         >
           <motion.div
             className={`${
-              isExpanded || isHovered ? 'text-blue-300' : 'text-slate-200'
+              isExpanded || isHovered ? colors.text.accent.replace('text-', '') : colors.text.secondary.replace('text-', '')
             } transition-colors duration-200`}
             animate={{ 
               rotate: isHovered ? [0, -5, 5, 0] : 0
@@ -210,12 +222,11 @@ const ExpandableSkillCard = ({ icon, name, isExpanded, isHovered, skillInfo, col
         
         {/* Clean skill name */}
         <motion.h3 
-          className={`text-center font-semibold text-white ${
+          className={`text-center font-semibold ${colors.text.primary} ${
             isExpanded ? 'text-xl mb-4' : 'text-base'
           }`}
           animate={{ 
-            scale: isExpanded ? 1.05 : 1,
-            color: isExpanded || isHovered ? '#93c5fd' : '#ffffff'
+            scale: isExpanded ? 1.05 : 1
           }}
           transition={{ duration: 0.3 }}
         >
@@ -251,7 +262,7 @@ const ExpandableSkillCard = ({ icon, name, isExpanded, isHovered, skillInfo, col
         {/* Simple click indicator */}
         {!isExpanded && (
           <motion.div
-            className="absolute bottom-3 right-3 text-xs text-slate-300"
+            className={`absolute bottom-3 right-3 text-xs ${colors.text.tertiary}`}
             animate={{ 
               opacity: isHovered ? 0.9 : 0
             }}
@@ -276,7 +287,8 @@ const CIcon = () => (
 
 // About Page Component
 export default function About() {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
 
   // Detailed skill information with unique descriptions
   const skillInfo = {
@@ -540,7 +552,7 @@ export default function About() {
                     skills={category.skills}
                     title={category.title}
                     skillInfo={skillInfo}
-                    colors={colors}
+                    theme={theme}
                   />
                 </motion.div>
               ))}

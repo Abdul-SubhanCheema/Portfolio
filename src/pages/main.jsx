@@ -7,7 +7,7 @@ import MagneticButton from '../components/MagneticButton';
 import AnimatedStats from '../components/AnimatedStats';
 import SocialLinks from '../components/SocialLinks';
 import { useTheme } from '../context/ThemeContext';
-import profileImg from '../assets/profile.jpg'
+import profileImg from '../assets/Media.jpg'
 
 export default function Portfolio() {
   const { colors } = useTheme();

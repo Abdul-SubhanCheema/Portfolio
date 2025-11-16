@@ -5,9 +5,9 @@ import Navbar from "../components/navbar";
 import NeuralNetwork from '../components/NeuralNetwork';
 import CustomCursor from '../components/CustomCursor';
 import { useTheme } from '../context/ThemeContext';
-import { FaGithub, FaExternalLinkAlt, FaSearch, FaFilter, FaCode, FaDatabase, FaMobile, FaGlobe } from "react-icons/fa";
+import { FaGithub, FaExternalLinkAlt, FaSearch, FaFilter, FaCode, FaDatabase, FaMobile, FaGlobe, FaLock, FaBuilding } from "react-icons/fa";
 
-const ProjectCard = ({ title, description, link, tech, category, status, index, theme }) => {
+const ProjectCard = ({ title, description, link, tech, category, status, isPrivate, companyName, index, theme }) => {
   const { colors, isDarkMode } = theme || {};
   
   if (!colors) return null;
@@ -30,9 +30,17 @@ const ProjectCard = ({ title, description, link, tech, category, status, index, 
   
   return (
     <motion.div
-      className={`group relative ${colors.glass.primary} rounded-xl p-6 transition-all duration-300 h-full flex flex-col`}
+      className={`group relative ${colors.glass.primary} rounded-xl p-6 transition-all duration-300 flex flex-col ${ 
+        isPrivate ? 'border-yellow-500/30' : ''
+      }`}
       style={{
-        border: `1px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}`,
+        border: `1px solid ${
+          isPrivate 
+            ? 'rgba(245, 158, 11, 0.3)' 
+            : isDarkMode 
+              ? 'rgba(255, 255, 255, 0.1)' 
+              : 'rgba(0, 0, 0, 0.1)'
+        }`,
       }}
       whileHover={{ 
         scale: 1.02,
@@ -45,8 +53,8 @@ const ProjectCard = ({ title, description, link, tech, category, status, index, 
         delay: index * 0.1
       }}
     >
-      {/* Category & Status Badge */}
-      <div className="flex justify-between items-start mb-4">
+      {/* Header Section with Badges */}
+      <div className="flex justify-between items-center mb-4">
         <span className={`px-2 py-1 text-xs font-medium rounded-full ${categoryColors[category]}`}>
           {category}
         </span>
@@ -55,10 +63,21 @@ const ProjectCard = ({ title, description, link, tech, category, status, index, 
         </span>
       </div>
       
-      <div className="flex-grow">
+      <div className="mb-4">
         <h3 className={`text-lg font-bold mb-3 ${colors.text.primary} group-hover:text-blue-400 transition-colors duration-200`}>
           {title}
         </h3>
+        
+        {/* Company Name for Private Projects */}
+        {isPrivate && companyName && (
+          <div className="mb-2 flex items-center gap-2">
+            <FaBuilding className={`text-xs ${colors.text.tertiary}`} />
+            <span className={`text-sm ${colors.text.tertiary} italic`}>
+              {companyName}
+            </span>
+          </div>
+        )}
+        
         <p className={`${colors.text.secondary} mb-4 text-sm leading-relaxed line-clamp-3`}>
           {description}
         </p>
@@ -66,32 +85,49 @@ const ProjectCard = ({ title, description, link, tech, category, status, index, 
         {/* Tech Stack */}
         {tech && (
           <div className="flex flex-wrap gap-1 mb-4">
-            {tech.slice(0, 4).map((techItem, i) => (
+            {tech.map((techItem, i) => (
               <span key={i} className={`px-2 py-1 text-xs bg-gray-500/20 ${colors.text.tertiary} rounded`}>
                 {techItem}
               </span>
             ))}
-            {tech.length > 4 && (
-              <span className={`px-2 py-1 text-xs bg-gray-500/20 ${colors.text.tertiary} rounded`}>
-                +{tech.length - 4}
-              </span>
-            )}
           </div>
         )}
       </div>
       
-      <motion.a
-        href={link}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={`inline-flex items-center justify-center px-4 py-2 rounded-lg bg-blue-500/20 text-blue-400 border border-blue-500/30 hover:bg-blue-500/30 transition-all duration-200 text-sm font-medium mt-auto`}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-      >
-        <FaGithub className="mr-2 text-sm" /> 
-        View Project
-        <FaExternalLinkAlt className="ml-2 text-xs opacity-70" />
-      </motion.a>
+      {/* Action Button */}
+      {isPrivate ? (
+        <div className="relative group">
+          <div className={`inline-flex items-center justify-center px-4 py-2 rounded-lg bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 text-sm font-medium cursor-not-allowed gap-2 w-full`}>
+            <FaLock className="text-xs" />
+            Confidential Project
+          </div>
+          {/* Tooltip */}
+          <div className={`absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 text-xs ${colors.glass.primary} ${colors.text.primary} rounded-lg border ${colors.border.primary} opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-10 pointer-events-none`}>
+            <div className="flex items-center gap-1.5">
+              <FaBuilding className="text-xs" />
+              <span>Owned by {companyName}</span>
+            </div>
+            <div className={`text-xs ${colors.text.tertiary} mt-1`}>
+              Protected under NDA
+            </div>
+            {/* Tooltip arrow */}
+            <div className={`absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800`}></div>
+          </div>
+        </div>
+      ) : (
+        <motion.a
+          href={link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`inline-flex items-center justify-center px-4 py-2 rounded-lg bg-blue-500/20 text-blue-400 border border-blue-500/30 hover:bg-blue-500/30 transition-all duration-200 text-sm font-medium`}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <FaGithub className="mr-2 text-sm" /> 
+          View Project
+          <FaExternalLinkAlt className="ml-2 text-xs opacity-70" />
+        </motion.a>
+      )}
     </motion.div>
   );
 };
@@ -101,6 +137,7 @@ export default function Projects() {
   const { colors } = theme;
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [showPrivate, setShowPrivate] = useState(true);
 
   const projects = [
     {
@@ -222,17 +259,48 @@ export default function Projects() {
       tech: ["React", "Hooks", "CSS3", "JavaScript"],
       category: "Frontend",
       status: "Complete"
-    }
+    },
+    {
+      title: "Hifz Quran Mobile App",
+      description: "AI-powered mobile application for Quran memorization with personalized learning paths, progress tracking, and intelligent revision reminders.",
+      link: null,
+      isPrivate: true,
+      companyName: "Planet Beyond",
+      tech: ["Flutter", "Node.js", "AI/ML", "MongoDB", "Python", "Firebase"],
+      category: "Mobile",
+      status: "Complete"
+    },
+    {
+      title: "Talk EHR System",
+      description: "Comprehensive Electronic Health Records system with patient management, appointment scheduling, and medical data analytics for healthcare providers.",
+      link: null,
+      isPrivate: true,
+      companyName: "Carecloud",
+      tech: ["Angular", ".NET Core", "SQL Server", "Azure", "TypeScript"],
+      category: "Full-Stack",
+      status: "Complete"
+    },
+    {
+    title: "Wedding Venue Booking System",
+    description: "Cross-platform mobile app for wedding venue management with booking calendar, vendor coordination, and real-time availability tracking.",
+    link: null,
+    isPrivate: true,
+    companyName: "Independent Client",
+    tech: ["React Native", "Node.js", "MongoDB", "Firebase"],
+    category: "Mobile",
+    status: "Complete"
+  }
   ];
 
-  const categories = ["All", "Full-Stack", "Frontend", "Backend", "Networks", "ML/AI", "Game"];
+  const categories = ["All", "Full-Stack", "Frontend", "Backend", "Mobile", "Networks", "ML/AI", "Game"];
 
   const filteredProjects = projects.filter(project => {
     const matchesSearch = project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          project.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          project.tech.some(t => t.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesCategory = selectedCategory === "All" || project.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+    const matchesPrivacy = showPrivate || !project.isPrivate;
+    return matchesSearch && matchesCategory && matchesPrivacy;
   });
 
   return (
@@ -324,20 +392,53 @@ export default function Projects() {
                 </button>
               ))}
             </div>
+
+            {/* Privacy Filter */}
+            <div className="flex items-center gap-3">
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={showPrivate}
+                  onChange={(e) => setShowPrivate(e.target.checked)}
+                  className="sr-only"
+                />
+                <div className={`relative w-11 h-6 rounded-full transition-colors duration-300 ${
+                  showPrivate ? 'bg-blue-500' : 'bg-gray-600'
+                }`}>
+                  <div className={`absolute w-4 h-4 bg-white rounded-full top-1 transition-transform duration-300 ${
+                    showPrivate ? 'translate-x-6' : 'translate-x-1'
+                  }`}></div>
+                </div>
+                <span className={`ml-2 text-sm ${colors.text.secondary}`}>
+                  Show Private Projects
+                </span>
+              </label>
+            </div>
           </motion.div>
 
-          {/* Projects Count */}
+          {/* Projects Count with Privacy Info */}
           <motion.div
             className="flex items-center justify-between mb-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
           >
-            <p className={`${colors.text.secondary} text-sm`}>
-              Showing {filteredProjects.length} of {projects.length} projects
-            </p>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+              <p className={`${colors.text.secondary} text-sm`}>
+                Showing {filteredProjects.length} of {projects.length} projects
+              </p>
+              <div className="flex items-center gap-4 text-xs">
+                <span className={`flex items-center gap-1 ${colors.text.tertiary}`}>
+                  <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                  Public: {projects.filter(p => !p.isPrivate).length}
+                </span>
+                <span className={`flex items-center gap-1 ${colors.text.tertiary}`}>
+                  <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                  Private: {projects.filter(p => p.isPrivate).length}
+                </span>
+              </div>
+            </div>
             
-            {/* View Toggle - could add grid/list view later */}
             <div className="flex items-center gap-2">
               <FaFilter className={`${colors.text.tertiary} text-sm`} />
               <span className={`${colors.text.tertiary} text-sm`}>Filter by category</span>
@@ -348,21 +449,24 @@ export default function Projects() {
           <AnimatePresence>
             {filteredProjects.length > 0 ? (
               <motion.div
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6"
                 layout
               >
                 {filteredProjects.map((project, index) => (
-                  <ProjectCard
-                    key={project.title}
-                    title={project.title}
-                    description={project.description}
-                    link={project.link}
-                    tech={project.tech}
-                    category={project.category}
-                    status={project.status}
-                    index={index}
-                    theme={theme}
-                  />
+                  <div key={project.title} className="break-inside-avoid mb-6">
+                    <ProjectCard
+                      title={project.title}
+                      description={project.description}
+                      link={project.link}
+                      tech={project.tech}
+                      category={project.category}
+                      status={project.status}
+                      isPrivate={project.isPrivate}
+                      companyName={project.companyName}
+                      index={index}
+                      theme={theme}
+                    />
+                  </div>
                 ))}
               </motion.div>
             ) : (

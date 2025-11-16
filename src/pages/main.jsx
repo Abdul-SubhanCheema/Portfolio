@@ -75,9 +75,9 @@ export default function Portfolio() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 1.1 }}
               >
-                <MagneticButton className={`relative ${colors.glass.hover} ${colors.text.accent} font-semibold py-2.5 px-6 md:py-3 md:px-8 rounded-lg shadow-lg overflow-hidden group border ${colors.border.primary} hover:scale-105 transition-all duration-300`}>
+                {/* <MagneticButton className={`relative ${colors.glass.hover} ${colors.text.accent} font-semibold py-2.5 px-6 md:py-3 md:px-8 rounded-lg shadow-lg overflow-hidden group border ${colors.border.primary} hover:scale-105 transition-all duration-300`}>
                   <span className="relative z-10">View My Work</span>
-                </MagneticButton>
+                </MagneticButton> */}
               </motion.div>
 
               <SocialLinks />

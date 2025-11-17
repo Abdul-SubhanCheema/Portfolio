@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
 import emailjs from "@emailjs/browser";
 import Navbar from "../components/navbar";
@@ -32,7 +33,7 @@ export default function Contact() {
         }
         return '';
       
-      case 'user_email':
+      case 'user_email': {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!value.trim()) {
           return 'Email is required';
@@ -40,6 +41,7 @@ export default function Contact() {
           return 'Please enter a valid email address';
         }
         return '';
+      }
       
       case 'message':
         if (!value.trim()) {
@@ -472,7 +474,7 @@ export default function Contact() {
                       { icon: FaEnvelope, label: "Email", value: "abdulsubhancheema97@gmail.com", href: "mailto:abdulsubhancheema97@gmail.com" },
                       { icon: FaPhone, label: "Phone", value: "+92 343 8903037", href: "tel:+923438903037" },
                       { icon: FaMapMarkerAlt, label: "Location", value: "Islamabad, Pakistan" }
-                    ].map((item, index) => (
+                    ].map((item) => (
                       <div key={item.label} className="group">
                         {item.href ? (
                           <a href={item.href} className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition-all duration-300">
@@ -515,7 +517,7 @@ export default function Contact() {
                       { icon: FaWhatsapp, href: "https://wa.me/923438903037", label: "WhatsApp", color: "green" },
                       { icon: FaFacebook, href: "https://www.facebook.com/share/16RRTzFgnh/", label: "Facebook", color: "blue" },
                       { icon: FaInstagram, href: "https://www.instagram.com/abdulsubhancheema?igsh=em92Y3VnajZlenpt", label: "Instagram", color: "pink" }
-                    ].map((social, index) => (
+                    ].map((social) => (
                       <motion.a
                         key={social.label}
                         href={social.href}

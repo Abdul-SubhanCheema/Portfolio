@@ -1,5 +1,6 @@
 
 import { Github, Linkedin, Twitter, Mail } from 'lucide-react';
+// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 

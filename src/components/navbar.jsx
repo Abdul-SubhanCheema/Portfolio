@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
@@ -9,6 +9,37 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
   const { isDarkMode, toggleTheme, colors } = useTheme();
+  const navRef = useRef(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (navRef.current && !navRef.current.contains(event.target)) {
+        setMenuOpen(false);
+      }
+    };
+
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') {
+        setMenuOpen(false);
+      }
+    };
+
+    if (menuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleEscape);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [menuOpen]);
+
+  // Close menu on route change
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname]);
 
   const navLinks = [
     { name: "Home", to: "/" },
@@ -18,7 +49,7 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="relative z-50 px-4 md:px-6 pt-6">
+    <nav className="relative z-50 px-4 md:px-6 pt-6" ref={navRef}>
       <motion.div 
         className={`container mx-auto ${colors.glass.primary} rounded-2xl px-6 py-4 shadow-2xl relative overflow-hidden`}
         initial={{ opacity: 0, y: -20 }}
@@ -69,7 +100,10 @@ const Navbar = () => {
           <div className="md:hidden relative z-10">
             <motion.button
               onClick={() => setMenuOpen(!menuOpen)}
-              className={`relative p-3 rounded-xl ${colors.glass.secondary} ${colors.text.accent} hover:${colors.text.accent.replace('text-', 'text-blue-')}200 transition-all duration-300 hover:${colors.glass.hover} focus:outline-none`}
+              aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+              aria-expanded={menuOpen}
+              aria-controls="mobile-menu"
+              className={`relative p-3 rounded-xl ${colors.glass.secondary} ${colors.text.accent} hover:${colors.text.accent.replace('text-', 'text-blue-')}200 transition-all duration-300 hover:${colors.glass.hover} focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:ring-offset-2 focus:ring-offset-transparent`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -127,7 +161,7 @@ const Navbar = () => {
                 >
                   <Link
                     to={link.to}
-                    className={`relative px-4 py-2 rounded-lg font-medium transition-all duration-300 group ${
+                    className={`relative px-4 py-2 rounded-lg font-medium transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:ring-offset-2 focus:ring-offset-transparent ${
                       isActive 
                         ? `${colors.text.accent} bg-blue-500/20 border border-blue-400/30` 
                         : `${colors.text.primary} hover:${colors.text.accent} hover:bg-white/10`
@@ -161,7 +195,9 @@ const Navbar = () => {
           {/* Theme Toggle Button */}
           <motion.button
             onClick={toggleTheme}
-            className={`relative p-3 rounded-xl ${colors.glass.secondary} ${colors.text.accent} hover:${colors.text.accent.replace('text-', 'text-blue-')}200 transition-all duration-300 hover:${colors.glass.hover} focus:outline-none group`}
+            aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+            title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+            className={`relative p-3 rounded-xl ${colors.glass.secondary} ${colors.text.accent} hover:${colors.text.accent.replace('text-', 'text-blue-')}200 transition-all duration-300 hover:${colors.glass.hover} focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:ring-offset-2 focus:ring-offset-transparent group`}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             initial={{ opacity: 0 }}
@@ -188,6 +224,9 @@ const Navbar = () => {
       <AnimatePresence>
         {menuOpen && (
           <motion.div
+            id="mobile-menu"
+            role="menu"
+            aria-label="Navigation menu"
             initial={{ height: 0, opacity: 0, scale: 0.95 }}
             animate={{ height: "auto", opacity: 1, scale: 1 }}
             exit={{ height: 0, opacity: 0, scale: 0.95 }}
@@ -213,8 +252,9 @@ const Navbar = () => {
                 >
                   <Link
                     to={link.to}
+                    role="menuitem"
                     onClick={() => setMenuOpen(false)}
-                    className={`relative block px-4 py-3 rounded-lg font-medium transition-all duration-300 ${
+                    className={`relative block px-4 py-3 rounded-lg font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:ring-offset-2 focus:ring-offset-transparent ${
                       isActive 
                         ? `${colors.text.accent} bg-blue-500/20 border border-blue-400/30` 
                         : `${colors.text.primary} hover:bg-white/10 hover:${colors.text.accent}`

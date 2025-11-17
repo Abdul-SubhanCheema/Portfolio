@@ -1,4 +1,5 @@
 import { useState } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import { IoLogoJavascript } from 'react-icons/io';
 import { 
@@ -18,6 +19,7 @@ import { useTheme } from '../context/ThemeContext';
 
 
 // Modern Skill Card Component
+// eslint-disable-next-line no-unused-vars
 const SkillCard = ({ name, icon: Icon, theme }) => {
   const [isHovered, setIsHovered] = useState(false);
   const { colors } = theme;
@@ -45,6 +47,7 @@ const SkillCard = ({ name, icon: Icon, theme }) => {
 };
 
 // Timeline Item Component
+// eslint-disable-next-line no-unused-vars
 const TimelineItem = ({ title, company, period, description, icon: Icon, isLast, theme }) => {
   const { colors } = theme;
   

@@ -166,6 +166,14 @@ export default function Projects() {
       status: "Complete"
     },
     {
+      title: "Quantum-Ready Cryptography",
+      description: "Post-quantum cryptography web application implementing Kyber512 algorithm for quantum-resistant encryption and decryption with secure Flask backend.",
+      link: "https://github.com/Abdul-SubhanCheema/Information_Security_Project",
+      tech: ["Python", "Flask", "Kyber512", "AES-GCM", "Bootstrap", "WTForms", "Cryptography"],
+      category: "Full-Stack",
+      status: "Complete"
+    },
+    {
       title: "Car Wash Management",
       description: "Web-based system for managing bookings, billing, and services efficiently.",
       link: "https://github.com/Abdul-SubhanCheema/Car-Wash-Management-System",

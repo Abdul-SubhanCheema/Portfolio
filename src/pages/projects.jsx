@@ -1,5 +1,4 @@
 
-// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import Navbar from "../components/navbar";
